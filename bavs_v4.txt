@@ -1,0 +1,367 @@
+Datei:
+    bavs_v4.txt
+
+Benoetigte Dateien:
+--------------------------------------------
+  bavs_v4.txt
+  bavs_v4p1a.java
+
+Bei der Durchfuehrung zu erzeugende Dateien:
+--------------------------------------------
+  bavs_v4prot.txt
+  bavs_v4p1b.java
+    
+
+Praktikum "Verteilte Systeme" Bachelor-Versuch 4
+----------------------------------------
+
+Hinweis:
+--------
+Diese Datei gilt gleichzeitig als Vorlage fuer die Erstellung des
+Versuchsprotokolls ! Kopieren Sie diese Datei zuerst in die Datei
+
+   bavs_v3prot.txt
+
+welche Ihr Versuchsprotokoll wird ! Die mit :: markierten Stellen
+sind dann (in der Datei bavs_v4prot.txt) vom Studenten auszufuellen !
+Ohne Ausfuellen dieser Stellen gibt es kein Testat !
+
+
+Studentendaten
+--------------
+Name::
+Vorname::
+Matr-Nr.::
+
+Versuch 4
+-----------------------------------------------------------------------
+
+Die ersten Teile des Versuches sind Vorbereitungsaufgaben, die Sie
+zuhause oder in den Praktikumsraeumen der FH vor dem eigentlichen 
+Termin erledigen koennen und sollen ! Die Erledigung dieser Aufgaben
+benoetigt durchaus einige Zeit und ist nicht am Termin vollstaendig 
+durchfuehrbar !
+
+
+Bei diesem Versuch wird eine Client-Server Anwendung erweitert und
+untersucht. Dabei wird insbesondere das Verhalten bei einem
+verlustbehafteten Netzwerk mit zufallsabhaengigen Verzoegerungen
+untersucht. Achtung, in der "vollen Ausbaustufe" ist
+das Programm insgesamt ca. 900 Zeilen gross. Also ist
+die ganze Sache nicht mehr so simpel. Allerdings kommen eine Reihe
+bereits vorhandener Klassen vor. Viele Zeilen sind auch schon
+programmiert, und dienen nur der Verpackung, damit alles drum_herum
+auch klappt. Die Kernfunktionen erstrecken sich auf nicht sehr
+viele Zeilen.
+
+
+Es wird die folgende Client-Server Anwendung betrachtet:
+
+Es werden Server verwendet, um SMS-Nachrichten von Mobiltelephonen
+zu speichern. Ein Server speichert dabei die NUMMER des Ziel-Telephons 
+zusammen mit der SMS. Pro Telephon kann nur eine SMS gespeichert
+werden. Ein Server stellt die folgenden Dienste zur Verfuegung:
+
+  ENTER      Uebermittlung eines (NUMMER,SMS) Paares zur Speicherung
+  DELETE     Loeschen der SMS die zu einer NUMMER gehoert
+  FIND       Auffinden einer SMS zu einer NUMMER
+  LIST       Auflisten aller gespeicherten PAARE im Server-Fenster
+  FIRST      AUffinden des ersten Elements der gespeicherten Liste
+
+Obwohl in dieser Aufgabe manchmal mehrere Clients auf
+einen Server zugreifen, koennen Sie davon ausgehen, dass diese
+das koordiniert tun. Sie muessen sich also nicht um die 
+Koordination und Synchronisation der Requests kuemmern !
+
+Der Dienst FIRST erbringt folgendes:
+Wenn die im Server gespeicherte Liste von (NUMMER,SMS) Paaren
+nicht leer ist, soll das erste Paar zurueckgegeben werden.
+Als "command" in der Antwortnachricht soll "answer_done"
+(siehe Constants) gesendet werden. Ist die Liste leer,
+soll als "command" der Wert "answer_notfound" zurueck gesendet
+werden. Als SMS soll dann "-EMPTY-"  zurueckgesandt werden.
+Der Dienst kann also benutzt werden, um nachzusehen, ob es
+noch (NUMMER,SMS) Paare auf dem Server gibt, und um auch
+gleich ein Paar zu bekommen. 
+
+
+
+***********************************************************************
+
+Vorbereitung-Aufgabe 4.1 : 
+
+Das JAVA Programm "bavs_v4p1a.java" ist lauffaehig. Bringen das 
+Programm zum Laufen und lernen Sie was es macht ! 
+
+
+Vorbereitung-Aufgabe 4.2 : 
+Machen Sie sich mit folgenden Klassen und Methoden vertraut:
+
+  4.2a 
+  Klasse "SmsMessage"
+  Die Klasse "SmsMessage" definiert eine Nachricht, welche an den
+  Sever geschickt wird, oder von ihm als Antwort verschickt wird.
+  Die Attribute haben folgende Aufgabe:
+  
+  Attribut "command"
+  Kommando, moegliche Werte sind in "Constants" definiert.
+  In command gibt der Client den gewuenschten Dienst an.
+  Der Server gibt in der Antwort an, ob das Kommando
+  erfolgreich ausgefuehrt werden konnte.
+
+  Attribut "id"
+  In "id" kann der Client der Nachricht eine Identifikation 
+  mitschicken. Der Server erhoeht den Wert von "id"
+  um 100000 und schickt die so ermittelte "id" in der
+  Antwort mit zurueck. Damit kann man testen, ob eine
+  Antwort zu einem Request gehoert !
+
+  Attribut "number"
+  In "number" werden die Telephon-Nummern uebermittelt.
+
+  Attribut "sms"
+  in "sms" wird eine SMS uebermittelt.
+
+  Die Klasse sms_message enthaelt ebenfalls Methoden
+  um die Attribute (von JAVA typ int bzw String) in
+  eine UDP Nachricht zu packen. Dazu wird ein
+  "ByteBuffer" Objekt verwendet. (Siehe Versuch 2 und 3)
+
+
+
+  4.2b 
+  Klasse SmsServer"
+  Objekte der Klasse "SmsServer" stellen einen Server 
+  zur Verfuegung. Sie laufen als eigenstaendiger Thread.
+  Es wird jeweils eine Nachricht erwartet. Der im "command"
+  der Nachricht erwuenschte Dienst wird erbracht, und eine
+  entsprechende Antwortnachricht an den jeweiliegen Client
+  zurueckgesandt. Zur Realisierung der Kommunikation
+  wird auf die aus Versuch 3 bekannten Klassen
+      "VsComm" und "NetworkSimulator"
+  zurueckgegriffen. Damit man verfolgen kann, was innerhalb
+  eines Server-Objekts passiert, verfuegt jedes Server-Objekt
+  ueber ein Ausgabefenster vom Typ "OutputFrame".
+  
+  Machen Sie sich mit der Realisierung der einzelnen
+  Dienste vertraut. Insbesondere wird ein Objekt der Klasse
+
+     "Treemap" aus dem JAVA.util package
+
+  verwendet, um die eigentliche Speicher-. und Such-Funktion
+  zu erfuellen. Machen Sie sich mit den zugehoerigen
+  Methoden vertraut !!!!!!!
+  
+  !!!!!!!!!!!!  Wichtig: Hinweis: !!!!!!!!!!!!!!
+  ---------------------------------------------
+  Sie muessen genau wissen, was bei den benutzten Treemap 
+  Methoden passiert, sonst wissen Sie nicht, was bei den
+  entsprechenden Server-Diensten passiert !!!!!!!!!!!!
+
+
+  4.2c
+  Klasse "SmsClient"
+  Objekte der Klasse "SmsClient" kapseln die erforderlichen 
+  Methoden und Attribute, um auf einfache Weise einen SmsClient
+  zu programmieren. Bei der Instanzierung ist dem Objekt der
+  zu benutzende Server als (InetAddress,port) mitzugeben. Ebenfalls
+  ist die eigene port-Nummer (fuer ausgehende Requests an den Server)
+  anzugeben und ein "OutputFrame" zur Protokollierung.
+
+  Die eigentliche Kommunikation wird von der Methode
+    "do_request"
+  erbracht, die ihrerseit "standard_request" benutzt. Die
+  Methode "standard_request" ist die einfachste Form
+  der Kommunikation. Sie geht davon aus, dass Nachrichten
+  ohne Verlust und Verzoegerung durchs Netzwerk gehen.
+  Es gibt keine Time-Outs und aehnliches. Ein "SmsClient" Objekt
+  verwendet seine eigene "Zeit" (local_time) zur Identifikation
+  "id" von Nachrichten.
+
+  4.2c
+  Klasse "copy_window"
+  Diese Klasse wird erst weiter unten besprochen !
+
+  4.2d
+  Klasse "client_window"
+  Objekte der Klasse "client_window" erstellen ein einfaches 
+  Ein/Ausgabefenster zur interaktiven Benutzung des SMS-Dienstes.
+  Dazu instanziieren sie ein "sms_client"-Objekt. Man kann
+  dann Requests an einen Server senden. Man kann einen Server 
+  veranlassen, seine Liste anzuzeigen. Man kann gespeicherte
+  (NUMMER,SMS) Paare loeschen. 
+
+  4.2e
+  Klasse "client_server_test"
+  Diese Klasse instanziiert die Objekte, um alles zusammen
+  zu testen. In der Originalversion  werden zwei sms_server 
+  gestartet (server a und server b). Weiter werden
+  zwei client-windows gestartet, client_a und client_b.
+  Dabei fragt client a den server a und client b den server_b.
+
+
+
+
+***********************************************************************
+ 
+Praktikums-Aufgabe 4.1 : 
+
+Lassen Sie das Programm in der Originalversion 
+   bavs_v4p1a.java
+laufen und probieren Sie aus, wie Client und Server zusammen 
+arbeiten.
+
+
+***********************************************************************
+ 
+
+Praktikums-Aufgabe 4.2 : 
+
+
+Bisher wurde das benutzte Netzwerk verlustfrei (p_loss=0.0) und
+ohne Verzoegerung (p_send=1.0) benutzt. Stellen Sie nun die
+Parameter auf
+  p_loss=0.5 und p_send=1.0
+und testen Sie erneut wie sich Client und Server verhalten.
+
+
+Frage:
+Warum klappt die Kommunikation nun nicht gut ?
+
+Antwort::
+
+***********************************************************************
+ 
+Praktikums-Aufgabe 4.3 : 
+
+Ihre Aufgabe ist es nun, die Client-Server Kommunikation
+so zu verbessern, dass das System auch dann einwandfrei arbeitet,
+wenn das Netzwerk Nachrichten verzoegert und eventuell verliert.
+Als Parameter sollen Sie waehlen:
+
+ p_loss=0.2 ;
+ p_send=0.3 ;
+
+Zu Testzwecken sind aber auch andere Kombinationen sinnvoll.
+An der Netzwerksimulation und am Server duerfen sie (natuerlich)
+nichts aendern. 
+
+Gehen Sie wie folgt vor:
+Schreiben sie eine Methode
+  "reliable_request"
+innerhalb der Klasse "sms_client". Diese Methode
+soll als Ersatz fuer "standard_request" verwendet werden und
+die gleiche Grundfunktion, aber verlaesslich, erledigen. Die
+Methode "do_request" soll also dann "reliable_request"
+anstelle von "standard_request" aufrufen. Damit "reliable_request"
+bei den verschiedenen Fehlern einwandfrei arbeitet, ueberlegen Sie 
+sich bitte die folgenden Situationen:
+
+
+Was passiert, wenn ein Server mehrmals die gleiche Dienstanfrage 
+erhaelt ? Ist das schlimm ? Darf man Anfragen also wiederholen ?
+
+Antwort::
+
+
+Wie kann man feststellen, ob eine erhaltene Antwortnachricht zu 
+der zuletzt gesendeten "Request" Nachricht gehoert ?
+
+Antwort::
+
+
+Wie stellt man fest, dass wohl keine Antwort mehr kommt und 
+etwas schief gegangen ist ?
+
+Antwort::
+
+
+Was macht man, wenn eine Request-Nachricht verloren gegangen ist ?
+
+Antwort::
+
+
+Nachdem Sie sich diese Dinge ueberlegt haben, programmieren
+Sie nun "reliable_request" so, dass der Client sicher sein
+kann, das der nachgefragte Dienst erbracht wurde, egal
+ob Request- oder Answer-Nachrichten verloren gegangen sind
+oder verzoegert wurden. Bauen Sie test-Ausdrucke ein,
+die im zu einem sms_client gehoerenden Protokollfenster
+zeigen, was er gerade tut, um den Dienst zu bekommen.
+
+
+Testen Sie Ihre Methode ! Jetzt muss die Client-Server Anwendung 
+bei beliebigen Verlusten und Verzoegerungen einwandfrei
+arbeiten. Dabei wird in Kauf genommen, dass es bei hoher 
+Verlustrate eventuell etwas laenger dauern kann, bis ein
+Dienst nachgewiesenerweise erbracht wurde.
+
+***********************************************************************
+ 
+Praktikums-Aufgabe 4.4 : 
+
+Nun stellen Sie sich folgende Situation vor. Einer der beiden Server
+ (A oder B) muss heruntergefahren werden. Vorher muessen alle
+(NUMMER,SMS) Paare auf den anderen Server gebracht werden.
+(Gehen Sie davon aus, dass keine kollidierendem (NUMMER,SMS) Paare 
+schon auf dem anderen Server sind.).
+
+Dazu steht (natuerlich) nur unser Verlust- und Verzoegerungsbehaftetes
+Netzwerk zur Verfuegung. In diese unsicheren Umgebung muessen Sie den 
+Dienst sicher erbringen ! Gehen Sie dazu wie folgt vor.
+
+In der Datei " bavs_v4p1a.java" ist bereits eine Klasse "copy_window" 
+vorbereitet. Die Klasse instanziiert zwei "SmsClient" Objekte
+zur Kommunikation mit Server A und Server B. Weiter ist eine
+einfache Bedienung mit zwei Buttons "A -> B" und "B -> A"
+implementiert. Die beiden Buttuns rufen jeweils
+die Methode copy_x_y auf. Diese Methode
+soll Die (NUMMER,SMS) Paare von Server x sicher nach Server y
+bringen. Danach muss Server x "leer" sein. Kein Paar darf
+verloren gehen.
+
+Implementieren Sie die Methode "copy_x_y", die das geforderte 
+leistet. Schicken Sie insbesondere nach dem eigentlichen
+Kopiervorgang eine "LIST" Anforderung an beide Server,
+damit man leicht kontrollieren kann, ob alles einwandfrei 
+geklappt hat.
+
+Testen Sie Ihre Methode auch mit verschiedenen Werten
+von p_loss und p_send. Wovon haengt die Laufzeit ab ?
+Die Instanziierung eines copy_window ist in Methode 
+  "test_ab"
+bereits vorgesehen !
+
+Frage:
+Weiviele Nachrichten werden (ungefaehr) gebraucht, um 20
+(NUMMER,SMS) Paare von A nach B zu bringen, wenn Sie
+  p_loss=0.2 ;
+  p_send=0.3 ;
+waehlen. Schreiben Sie dazu in die Methode test_ab einen kleinen
+Programmteil, der den Server A mit 20 Paaren (NUMMER,SMS) fuellt.
+Dazu duerfen Sie direkt auf 
+  "server_a.sms_map"
+zugreifen, muessen also nicht als Client auftreten.
+Die Anzahl der Nachrichten koennen Sie einigermassen gut
+aus den verwendeten "id"s erschliessen. Denken Sie daran,
+dass die clients jeweils eigene "id"s vergeben, Also
+zwei Nachrichtenzaehlungen parallel laufen. Wer will
+kann in die Klasse "network_simulator" auch einen
+Nachrichtenzaehler einbauen.
+
+
+Antwort::
+
+Hinweis: Gehen sie davon aus, dass waehrend des Kopiervorgangs
+keine anderen Clients auf die Server zugreifen, als die, die
+am Kopiervorgang beteiligt sind. Sie muessen also
+keine Sperren vergeben, um solche Zugrife zu blockieren.
+Eine echte Anwendung muesste das tun.
+
+
+
+***********************************************************************
+Ende Versuch4
+***********************************************************************
+
+
