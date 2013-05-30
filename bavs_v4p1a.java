@@ -558,7 +558,8 @@ class SmsClient {
     }
 
   public void do_request() { 
-    standard_request() ; 
+    //standard_request() ;
+	  reliable_request();
     // spater ersetzen durch:
     // reliable_request() ; 
     }
@@ -575,6 +576,25 @@ class SmsClient {
     RX_message.unpackFromBuffer() ;
     System.out.println("TX id="+TX_message.id+" RX_id="+RX_message.id) ;
     }
+  
+  public void reliable_request() {
+	boolean retry = true;
+	do {
+		local_time++ ;
+		TX_message.id=local_time ;
+		TX_message.packToBuffer();
+		client_socket.OutBuffer=TX_message.buffer.contents ;
+		client_socket.message_id=TX_message.id ;
+		client_socket.send(server_port,serverAddress) ;
+		client_socket.receive(5000) ;
+		RX_message.buffer.contents=client_socket.inDatagram.getData() ;
+		RX_message.unpackFromBuffer() ;
+		if(TX_message.id == RX_message.id-100000) retry = false;
+		else System.out.println("ERROR: SendID doesn't match RequestID");
+	}
+	while(retry);
+	System.out.println("TX id="+TX_message.id+" RX_id="+RX_message.id) ;		
+  }
 
  
   }
@@ -804,8 +824,8 @@ class ClientServerTest {
 void testAB()
   {
    global_network=new NetworkSimulator() ;
-   global_network.p_loss=0.0 ;
-   global_network.p_send=1.0 ;
+   global_network.p_loss=0.2 ;
+   global_network.p_send=0.3 ;
 
    global_network.start();
 

@@ -261,24 +261,24 @@ sich bitte die folgenden Situationen:
 Was passiert, wenn ein Server mehrmals die gleiche Dienstanfrage 
 erhaelt ? Ist das schlimm ? Darf man Anfragen also wiederholen ?
 
-Antwort::
+Antwort::Nein es ist nicht schlimm da der Server die alte Nachricht überschreibt. Die Methode ist idempotent.
 
 
 Wie kann man feststellen, ob eine erhaltene Antwortnachricht zu 
 der zuletzt gesendeten "Request" Nachricht gehoert ?
 
-Antwort::
+Antwort::Wenn RX.ID-100000 = TX.ID ist alles ok.
 
 
 Wie stellt man fest, dass wohl keine Antwort mehr kommt und 
 etwas schief gegangen ist ?
 
-Antwort::
+Antwort::Die RX.ID-100000 ist < als die TX.ID
 
 
 Was macht man, wenn eine Request-Nachricht verloren gegangen ist ?
 
-Antwort::
+Antwort::Man sendet nocheinmal die gleiche Nachricht und wartet auf die Request-Nachricht (wegen idempotens nicht weiter schlimm).
 
 
 Nachdem Sie sich diese Dinge ueberlegt haben, programmieren
