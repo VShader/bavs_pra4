@@ -350,7 +350,7 @@ kann in die Klasse "network_simulator" auch einen
 Nachrichtenzaehler einbauen.
 
 
-Antwort::
+Antwort::Das ganze braucht 75 Nachrichten und 240s.
 
 Hinweis: Gehen sie davon aus, dass waehrend des Kopiervorgangs
 keine anderen Clients auf die Server zugreifen, als die, die

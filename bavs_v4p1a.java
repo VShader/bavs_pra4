@@ -804,6 +804,7 @@ copy_window(  String title ,
 	  }
 	  long timeFinish = System.currentTimeMillis();
 	  x.list_request();
+	  y.list_request();
 	  System.out.println("Process finished after: " +((timeFinish-timeStart)/1000) +"s");
     }
 
