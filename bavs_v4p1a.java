@@ -790,7 +790,21 @@ copy_window(  String title ,
 
   void copy_x_y(SmsClient x , SmsClient y)
     {
-   // hier code einfuegen
+	  long timeStart = System.currentTimeMillis();
+	  while(true) {
+		  String tmpName;
+		  int tmpMatrikel;
+		  x.first_sms_request() ;
+	      //matrField.setText(""+x.RX_message.number);
+	      if (x.RX_message.command==Constants.answer_notfound) break;
+	      tmpName = x.RX_message.sms;
+	      tmpMatrikel = x.RX_message.number;
+	      y.enter_sms_request(tmpMatrikel,tmpName);
+	      x.delete_sms_request(tmpMatrikel);
+	  }
+	  long timeFinish = System.currentTimeMillis();
+	  x.list_request();
+	  System.out.println("Process finished after: " +((timeFinish-timeStart)/1000) +"s");
     }
 
   class b_to_a_listener implements ActionListener
@@ -849,6 +863,10 @@ void testAB()
    copy_window window_c=new copy_window("COPY",global_network,
         server_a_address,server_a_port,4557,
         server_b_address,server_b_port,4558) ;
+   
+   for(int i=100050; i<100070; i++) {
+	   server_a.sms_map.put(new Integer(i),"Test: "+i) ;
+   }
   
 
   }
